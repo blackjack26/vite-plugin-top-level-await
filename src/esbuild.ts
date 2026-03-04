@@ -1,14 +1,11 @@
 // Import the `esbuild` package installed by `vite`
 
-import path from "path";
-const Module = require("module");
+import { createRequire } from "module"
 
-function requireFrom(self: any, contextModuleName: string, wantedModuleName: string) {
-  const contextModulePath = Module._resolveFilename(contextModuleName, self);
-  const virtualModule = new Module(contextModulePath, module);
-  virtualModule.filename = contextModulePath;
-  virtualModule.paths = Module._nodeModulePaths(path.dirname(contextModulePath));
-  return virtualModule.require(wantedModuleName);
+function requireFrom(contextModuleName: string, wantedModuleName: string) {
+  const contextModulePath = require.resolve(contextModuleName);
+  const customRequire = createRequire(contextModulePath);
+  return customRequire(wantedModuleName);
 }
 
-export default requireFrom(module, "vite", "esbuild") as typeof import("esbuild");
+export default requireFrom("vite", "esbuild") as typeof import("esbuild");
